@@ -1,0 +1,45 @@
+# Various types of parameters organized in a section
+
+section:
+
+  param_int: 1
+
+  param_float: 1.
+
+  param_string: a
+
+  param_list: [0,1,2,3]
+
+  param_list2:
+
+    - 'a'
+    - 'b'
+    - 'c'
+
+  param_path: my_file.txt
+
+# Example on how to dynamically instantiate objects from a config file
+
+dynamic_init:
+
+  objectA:
+
+    class: ClassA
+
+    args:
+      - 1
+      - a
+
+    kwargs:
+      foo: 2
+      bas: b
+
+  objectB:
+
+    class: ClassB
+
+    args: []
+
+    kwargs:
+      foo: 3
+  
