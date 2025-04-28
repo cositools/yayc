@@ -1,8 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
 
-import numpy as np
-
 import yaml
 
 from pathlib import Path
@@ -108,7 +106,7 @@ class Configurator:
 
         The foreseen use case scenario is to let the uses override parameters 
         from command line e.g. :code:`--override "group:parameter = new_value"`.
-        Note that the values can be override directly in code by using
+        Note that the values can be overridden directly in code by using
         :code:`config['group:parameter'] = new_value"`.
 
         Parameters
@@ -119,7 +117,7 @@ class Configurator:
         
         if len(args) == 1:
         
-            if np.isscalar(args[0]):
+            if isinstance(args[0], str):
                 # Standard, single key
                 key,value = args[0].split("=")
 
