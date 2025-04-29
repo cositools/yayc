@@ -41,6 +41,11 @@ class Configurator:
     def config_path(self):
         return self._config_path
 
+    @config_path.setter
+    def config_path(self, config_path):
+        self._config_path = Path(config_path)
+        self._config_dir = self.config_path.parent
+
     @classmethod
     def open(cls, config_path):
 
