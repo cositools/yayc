@@ -15,30 +15,43 @@ class Configurator:
     
     Parameters
     ----------
-    config : Path
-        Path to yaml configuration file.
+    config : dict
+        Loaded yaml file
+    config_path: Path
+        Location of this config file. If None, absolute_path will return paths
+        relative to the current working directory
     """
 
-    def __init__(self, config = None):
+    def __init__(self, config = None, config_path = None):
 
-        if config is None:
-            self._config = None
+        self._config = config
+
+        if config_path is None:
+            self._config_dir = Path.cwd()
+            self._config_path = None
         else:
-            self._config = config
+            self._config_path = Path(config_path)
+            self._config_dir = self.config_path.parent
+
+        # This allows use subconfig[] to get a new config, not
+        # the value
+        self.subconfig = self._subconfig(self)
+
+    @property
+    def config_path(self):
+        return self._config_path
 
     @classmethod
     def open(cls, config_path):
 
-        new = cls()
-        
-        new._config = {}
+        config_path = Path(config_path)
 
-        new.config_path = Path(config_path)
-        
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        new = cls(config, config_path)
+
         logger.info("Using configuration file at %s", config_path)
-
-        with open(new.config_path) as f:
-            new._config = yaml.safe_load(f)
 
         return new
             
@@ -97,7 +110,25 @@ class Configurator:
             value = default
  
         return value
-        
+
+    class _subconfig:
+        """
+        See self.subconfig = self._subconfig(self) in the
+        main class __init__
+        """
+
+        def __init__(self, config):
+            self._main_config = config
+
+        def __getitem__(self, key):
+
+            config = Configurator(self._main_config[key])
+
+            config._config_dir = self._main_config._config_dir
+            config._config_path = self._main_config._config_path
+
+            return config
+
     def override(self, *args):
         """
         Override one or more parameter by parsings strings of the form
@@ -153,7 +184,7 @@ class Configurator:
         if path.is_absolute():
             return path
         else:
-            return (self.config_path.parent / path).resolve()
+            return (self._config_dir / path).resolve()
 
     def dump(self, *args, **kwargs):
         """
